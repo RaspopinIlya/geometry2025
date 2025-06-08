@@ -37,45 +37,30 @@ int main(int argc, char* argv[]) {
 
   /* Сюда нужно вставить обработчик post запроса для алгоритма. */
 
-  svr.Post("/GrahamScan",
-           [&](const httplib::Request& req, httplib::Response& res) {
-    try {
-      auto input = json::parse(req.body);
-      json output;
+    /* /InsertionSort это адрес для запросов на сортировку вставками
+ на сервере. */
+    svr.Post("/VoronoiPolygon", [&](const httplib::Request& req,
+        httplib::Response& res) {
+            /*
+            Поле body структуры httplib::Request содержит текст запроса.
+            Функция nlohmann::json::parse() используется для того,
+            чтобы преобразовать текст в объект типа nlohmann::json.
+            */
+            nlohmann::json input = nlohmann::json::parse(req.body);
+            nlohmann::json output;
 
-      int result = geometry::GrahamScanMethod(input, &output);
+            /* Если метод завершился с ошибкой, то выставляем статус 400. */
+            if (geometry::VoronoiPolygonMethod(input, &output) < 0)
+                res.status = 400;
 
-      if (result != 0) {
-        res.status = 400;  // Bad request
-      }
-
-      res.set_content(output.dump(), "application/json");
-    } catch (const std::exception& e) {
-      json error_output = {{"error", std::string("Parse error: ") + e.what()}};
-      res.status = 400;
-      res.set_content(error_output.dump(), "application/json");
-    }
-  });
-
-    svr.Post("/AnglePointInPolygon",
-           [&](const httplib::Request& req, httplib::Response& res) {
-    try {
-      auto input = json::parse(req.body);
-      json output;
-
-      int result = geometry::AnglePointInPolygonMethod(input, &output);
-
-      if (result != 0) {
-        res.status = 400;  // Bad request
-      }
-
-      res.set_content(output.dump(), "application/json");
-    } catch (const std::exception& e) {
-      json error_output = {{"error", std::string("Parse error: ") + e.what()}};
-      res.status = 400;
-      res.set_content(error_output.dump(), "application/json");
-    }
-  });
+            /*
+            Метод nlohmann::json::dump() используется для сериализации
+            объекта типа nlohmann::json в строку. Метод set_content()
+            позволяет задать содержимое ответа на запрос. Если передаются
+            JSON данные, то MIME тип следует выставить application/json.
+            */
+            res.set_content(output.dump(), "application/json");
+        });
 
   /* Конец вставки. */
 

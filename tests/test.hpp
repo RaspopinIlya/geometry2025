@@ -38,7 +38,7 @@ void TestOrientation();
  * @param cli pointer to HTTP client
  */
 
-void TestGrahamScan(httplib::Client* cli);
+void TestVoronoiPolygon(httplib::Client* cli);
 
 /* Конец вставки. */
 
